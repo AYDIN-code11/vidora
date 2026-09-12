@@ -64,10 +64,14 @@ class HistoryScreen extends StatelessWidget {
 
   void _pickSort(BuildContext context) {
     final app = context.read<AppState>();
+    const options = [
+      ('Newest first', HistorySort.newest),
+      ('Oldest first', HistorySort.oldest),
+    ];
     showModalBottomSheet<void>(
       backgroundColor: V.surface,
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -77,28 +81,21 @@ class HistoryScreen extends StatelessWidget {
                   style: TextStyle(
                       color: V.text, fontSize: 15, fontWeight: FontWeight.w700)),
             ),
-            RadioListTile<HistorySort>(
-              activeColor: V.red,
-              value: HistorySort.newest,
-              groupValue: app.historySort,
-              onChanged: (v) {
-                app.setHistorySort(v!);
-                Navigator.pop(context);
-              },
-              title: const Text('Newest first',
-                  style: TextStyle(color: V.text)),
-            ),
-            RadioListTile<HistorySort>(
-              activeColor: V.red,
-              value: HistorySort.oldest,
-              groupValue: app.historySort,
-              onChanged: (v) {
-                app.setHistorySort(v!);
-                Navigator.pop(context);
-              },
-              title: const Text('Oldest first',
-                  style: TextStyle(color: V.text)),
-            ),
+            for (final (label, value) in options)
+              ListTile(
+                leading: Icon(
+                  app.historySort == value
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
+                  color: V.red,
+                  size: 20,
+                ),
+                title: Text(label, style: const TextStyle(color: V.text)),
+                onTap: () {
+                  app.setHistorySort(value);
+                  Navigator.pop(sheetContext);
+                },
+              ),
             const SizedBox(height: 8),
           ],
         ),

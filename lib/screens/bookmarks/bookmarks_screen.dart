@@ -51,10 +51,15 @@ class BookmarksScreen extends StatelessWidget {
 
   void _pickSort(BuildContext context) {
     final app = context.read<AppState>();
+    const options = [
+      ('Newest first', BookmarkSort.newest),
+      ('Oldest first', BookmarkSort.oldest),
+      ('Title A–Z', BookmarkSort.title),
+    ];
     showModalBottomSheet<void>(
       backgroundColor: V.surface,
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -64,20 +69,20 @@ class BookmarksScreen extends StatelessWidget {
                   style: TextStyle(
                       color: V.text, fontSize: 15, fontWeight: FontWeight.w700)),
             ),
-            for (final (label, value) in const [
-              ('Newest first', BookmarkSort.newest),
-              ('Oldest first', BookmarkSort.oldest),
-              ('Title A–Z', BookmarkSort.title),
-            ])
-              RadioListTile<BookmarkSort>(
-                activeColor: V.red,
-                value: value,
-                groupValue: app.bookmarkSort,
-                onChanged: (v) {
-                  app.setBookmarkSort(v!);
-                  Navigator.pop(context);
-                },
+            for (final (label, value) in options)
+              ListTile(
+                leading: Icon(
+                  app.bookmarkSort == value
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
+                  color: V.red,
+                  size: 20,
+                ),
                 title: Text(label, style: const TextStyle(color: V.text)),
+                onTap: () {
+                  app.setBookmarkSort(value);
+                  Navigator.pop(sheetContext);
+                },
               ),
             const SizedBox(height: 8),
           ],

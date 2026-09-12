@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:vidora/main.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/services/youtube_service.dart';
-import 'package:vidora/services/trending_client.dart';
 import 'package:vidora/models/local_models.dart';
 import 'package:vidora/state/app_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';

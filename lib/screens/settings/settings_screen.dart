@@ -44,7 +44,7 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => _pickQuality(context, app),
           ),
           SwitchListTile(
-            activeColor: V.red,
+            activeThumbColor: V.red,
             secondary: AppIcons.play.icon(size: 22),
             title: const Text('Autoplay next',
                 style: TextStyle(color: V.text, fontSize: 14.5)),
@@ -56,7 +56,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           _section('Privacy'),
           SwitchListTile(
-            activeColor: V.red,
+            activeThumbColor: V.red,
             secondary: AppIcons.history.icon(size: 22),
             title: const Text('Watch history',
                 style: TextStyle(color: V.text, fontSize: 14.5)),
@@ -105,10 +105,11 @@ class SettingsScreen extends StatelessWidget {
       );
 
   void _pickQuality(BuildContext context, AppState app) {
+    const qualities = [360, 480, 720, 1080, 1440, 2160];
     showModalBottomSheet<void>(
       backgroundColor: V.surface,
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -118,19 +119,23 @@ class SettingsScreen extends StatelessWidget {
                   style: TextStyle(
                       color: V.text, fontSize: 15, fontWeight: FontWeight.w700)),
             ),
-            for (final h in const [360, 480, 720, 1080, 1440, 2160])
-              RadioListTile<int>(
-                activeColor: V.red,
-                value: h,
-                groupValue: app.defaultResolution,
-                onChanged: (v) {
-                  app.setDefaultResolution(v!);
-                  Navigator.pop(context);
-                },
+            for (final h in qualities)
+              ListTile(
+                leading: Icon(
+                  app.defaultResolution == h
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
+                  color: V.red,
+                  size: 20,
+                ),
                 title: Text(
                   h == 2160 ? 'Highest available (4K+)' : '${h}p',
-                  style: const TextStyle(color: V.text),
+                  style: const TextStyle(color: V.text, fontSize: 14),
                 ),
+                onTap: () {
+                  app.setDefaultResolution(h);
+                  Navigator.pop(sheetContext);
+                },
               ),
             const SizedBox(height: 8),
           ],
@@ -144,10 +149,10 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: V.surface,
       context: context,
       isScrollControlled: true,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.6,
+            maxHeight: MediaQuery.of(sheetContext).size.height * 0.6,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -164,20 +169,25 @@ class SettingsScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: _regions.entries
-                        .map((e) => RadioListTile<String>(
-                              activeColor: V.red,
-                              value: e.key,
-                              groupValue: app.region,
-                              onChanged: (v) {
-                                app.setRegion(v!);
-                                Navigator.pop(context);
-                              },
-                              title: Text('${e.value} (${e.key})',
-                                  style:
-                                      const TextStyle(color: V.text)),
-                            ))
-                        .toList(),
+                    children: [
+                      for (final e in _regions.entries)
+                        ListTile(
+                          leading: Icon(
+                            app.region == e.key
+                                ? Icons.radio_button_checked
+                                : Icons.radio_button_off,
+                            color: V.red,
+                            size: 20,
+                          ),
+                          title: Text('${e.value} (${e.key})',
+                              style:
+                                  const TextStyle(color: V.text, fontSize: 14)),
+                          onTap: () {
+                            app.setRegion(e.key);
+                            Navigator.pop(sheetContext);
+                          },
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -192,7 +202,7 @@ class SettingsScreen extends StatelessWidget {
   void _about(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: V.surface,
         title: Row(children: [
           AppIcons.logo.icon(size: 30),
@@ -219,7 +229,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Close', style: TextStyle(color: V.red)),
           ),
         ],

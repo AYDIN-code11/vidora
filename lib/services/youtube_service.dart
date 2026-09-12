@@ -36,24 +36,20 @@ class Yt {
   Kmep? _kmep;
   TrendingClient? _trending;
 
+  static const _ua =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+      '(KHTML, like Gecko) Chrome/124.0 Safari/537.36';
+
   /// The shared Kmep facade. Lazily constructed; the headless WebView
   /// runtimes spin up on first stream resolution.
-  Kmep get kmep {
-    if (_kmep == null) {
-      // Separate JS contexts: player.js and BotGuard contaminate
-      // each other when sharing globals (per KMEP docs).
-      _kmep = Kmep.withOnDevicePoToken(
+  Kmep get kmep => _kmep ??= Kmep.withOnDevicePoToken(
+        // Separate JS contexts: player.js and BotGuard contaminate
+        // each other when sharing globals (per KMEP docs).
         jsRuntime: WebViewJsRuntime(),
         potJsRuntime: WebViewJsRuntime(),
         fetchText: fetchText,
       );
-    }
-    return _kmep!;
-  }
-
-  TrendingClient get trending => _trending ??= TrendingClient();  static const _ua =
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-      '(KHTML, like Gecko) Chrome/124.0 Safari/537.36';
+  TrendingClient get trending => _trending ??= TrendingClient();
 
   /// Plain HTTP GET as text — the one platform thing KMEP needs.
   static Future<String> fetchText(String url) async {

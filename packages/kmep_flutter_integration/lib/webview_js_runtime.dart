@@ -145,7 +145,7 @@ class WebViewJsRuntime implements JsRuntime {
   /// var из player.js мог затереть их через indirect eval), размер
   /// __closureFns, найденная discovery функция. Бросает при аномалиях.
   Future<Map<String, dynamic>> envSnapshot() async {
-    final src = '(function(){'
+    const src = '(function(){'
         'try{ return JSON.stringify({'
         'echo:String(6*7),'
         'href:String(location.href),'
@@ -183,7 +183,7 @@ class WebViewJsRuntime implements JsRuntime {
     // Плоская обёртка: выражение подставляется КАК ЕСТЬ в var r=(...),
     // без вложенной IIFE (см. доку класса — грабля Android).
     final src = '(function(){'
-        'try{ var r=(${expression}); '
+        'try{ var r=($expression); '
         'return JSON.stringify({ok:true,'
         'v:String(r===undefined?"":r),'
         't:r===null?"null":typeof r}); }'
