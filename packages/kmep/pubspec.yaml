@@ -1,0 +1,50 @@
+name: kmep
+description: >
+  A stable alternative to NewPipeExtractor for Dart and Flutter:
+  YouTube extraction fully in-process (no JVM, no Python, no server).
+  Multi-client InnerTube fallback (ANDROID_VR/WEB/IOS/TV), on-device
+  player.js execution, on-device PO token (BotGuard) generation.
+  Videos up to 4K, live/HLS, search, shorts, channels, playlists,
+  comments — behind a typed facade. 98% live-audited success rate.
+version: 0.3.0
+license: GPL-3.0-or-later
+homepage: https://github.com/dipodev20/kmep
+repository: https://github.com/dipodev20/kmep
+issue_tracker: https://github.com/dipodev20/kmep/issues
+documentation: https://github.com/dipodev20/kmep/blob/main/dart/README.md
+keywords:
+  - newpipe
+  - youtube
+  - extractor
+  - dart
+  - flutter
+  - innertube
+  - po-token
+  - botguard
+  - yt-dlp
+  - freetube
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  http: ^1.2.0
+  # flutter_js убран отсюда: этот пакет должен оставаться чистым Dart
+  # (dart pub get / dart test / diagnostic tool должны работать без Flutter
+  # SDK). Конкретная реализация JsRuntime на flutter_js — в
+  # flutter_integration/, подключается на шаге интеграции в само
+  # Flutter-приложение Vidora, где Flutter SDK уже есть.
+
+dev_dependencies:
+  test: ^1.24.0
+  lints: ^3.0.0
+
+# Проверка pub на «утечки ключей» ругается на InnerTube-константы
+# (AIzaSy…). Это ПУБЛИЧНЫЕ константы клиентов YouTube — те же строки
+# в открытых репо yt-dlp и NewPipeExtractor, секретами не являются:
+# любой клиент YouTube обязан слать их в каждом запросе.
+false_secrets:
+  - lib/src/core/botguard_pot_provider.dart
+  - player_js_dump.js
+  - tool/client_matrix.js
+  - tool/find_nsig.js

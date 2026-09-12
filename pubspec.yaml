@@ -1,0 +1,39 @@
+name: vidora
+description: Vidora — a privacy-friendly YouTube client for Android built with Flutter and KMEP. Browse, search, watch and subscribe without ads or tracking.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  kmep:
+    path: packages/kmep
+  kmep_flutter_integration:
+    path: packages/kmep_flutter_integration
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.10
+  shared_preferences: ^2.3.2
+  provider: ^6.1.2
+  http: ^1.2.2
+  media_kit: ^1.1.11
+  media_kit_video: ^1.2.5
+  media_kit_libs_android_video: ^1.3.6
+  wakelock_plus: ^1.2.8
+  path_provider: ^2.1.4
+  flutter_inappwebview: ^6.1.5
+  share_plus: ^10.0.2
+  url_launcher: ^6.3.0
+  cached_network_image: ^3.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/

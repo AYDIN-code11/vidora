@@ -1,0 +1,33 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+build/
+.pub-cache/
+.pub/
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Android
+android/.gradle/
+android/local.properties
+android/key.properties
+**/android/**/gradle-wrapper.jar
+**/android/.cxx/
+
+# iOS (not used)
+ios/
+.dart_tool/flutter_build/
+
+# Coverage / misc
+coverage/
+*.log
+*.swp
+.DS_Store
+
+# Don't commit lockfile churn? Keep it — reproducible CI builds.
+mipmap-*/
+.flutter-plugins-dependencies
+.flutter-plugins
+

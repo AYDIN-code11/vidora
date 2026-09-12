@@ -1,0 +1,25 @@
+# Flutter-обвязка KMEP: JsRuntime для мобильных.
+# НЕ часть чистого Dart-пакета (dart/) — требует Flutter SDK.
+#
+# Два рантайма:
+# - WebViewJsRuntime (webview_js_runtime.dart) — РЕКОМЕНДУЕМЫЙ для прода:
+#   headless flutter_inappwebview, системный движок. ПРОВЕРЕН НА
+#   УСТРОЙСТВЕ (харнес v14): QuickJS во flutter_js недетерминированно
+#   падает на player.js ("unconsistent stack size"), WebView — нет.
+# - FlutterJsRuntime (flutter_js_runtime.dart) — legacy/резерв.
+#
+#   flutter pub get && flutter test
+name: kmep_flutter_integration
+publish_to: none
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_js: ^0.8.3
+  flutter_inappwebview: ^6.1.5
+  kmep:
+    path: ../kmep
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
