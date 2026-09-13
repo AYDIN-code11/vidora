@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kmep/kmep.dart' show VideoSearchResult;
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/services/youtube_service.dart';
 import 'package:vidora/widgets/common.dart';
@@ -89,9 +90,9 @@ class _ShortsScreenState extends State<ShortsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: V.bg,
-      appBar: AppBar(title: Text('Shorts — ${_queries[_queryIndex]}')),
+      appBar: AppBar(title: Text('${context.s.homeShorts} — ${_queries[_queryIndex]}')),
       body: _loading && _items.isEmpty
-          ? const Loader(label: 'Loading shorts…')
+          ? Loader(label: context.s.loadingShorts)
           : _error != null
               ? ErrorView(message: _error!, onRetry: _load)
               : NotificationListener<ScrollNotification>(

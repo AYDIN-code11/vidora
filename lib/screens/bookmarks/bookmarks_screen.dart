@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/models/local_models.dart';
 import 'package:vidora/state/app_state.dart';
@@ -18,7 +19,7 @@ class BookmarksScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: V.bg,
       appBar: AppBar(
-        title: const Text('Bookmarks'),
+        title: Text(context.s.saved),
         actions: [
           IconButton(
             tooltip: 'Sort',
@@ -36,9 +37,7 @@ class BookmarksScreen extends StatelessWidget {
         ],
       ),
       body: items.isEmpty
-          ? const EmptyView(
-              message:
-                  'No bookmarks yet. Tap the bookmark icon on any video.')
+          ? EmptyView(message: context.s.bookmarksEmpty)
           : ListView.separated(
               padding: const EdgeInsets.all(12),
               itemCount: items.length,
@@ -51,10 +50,11 @@ class BookmarksScreen extends StatelessWidget {
 
   void _pickSort(BuildContext context) {
     final app = context.read<AppState>();
-    const options = [
-      ('Newest first', BookmarkSort.newest),
-      ('Oldest first', BookmarkSort.oldest),
-      ('Title A–Z', BookmarkSort.title),
+    final s = context.s;
+    final options = [
+      (s.sortNewest, BookmarkSort.newest),
+      (s.sortOldest, BookmarkSort.oldest),
+      (s.titleAZ, BookmarkSort.title),
     ];
     showModalBottomSheet<void>(
       backgroundColor: V.surface,
@@ -63,10 +63,10 @@ class BookmarksScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(14),
-              child: Text('Sort by',
-                  style: TextStyle(
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Text(context.s.sortBy,
+                  style: const TextStyle(
                       color: V.text, fontSize: 15, fontWeight: FontWeight.w700)),
             ),
             for (final (label, value) in options)
@@ -96,14 +96,14 @@ class BookmarksScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: V.surface,
-        title: const Text('Remove all bookmarks?',
-            style: TextStyle(color: V.text)),
-        content: const Text('Saved videos will be removed from this device.',
-            style: TextStyle(color: V.textDim)),
+        title: Text(context.s.removeAllQ,
+            style: const TextStyle(color: V.text)),
+        content: Text(context.s.bookmarksBody,
+            style: const TextStyle(color: V.textDim)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: V.textDim)),
+            child: Text(context.s.cancel, style: const TextStyle(color: V.textDim)),
           ),
           TextButton(
             style: TextButton.styleFrom(foregroundColor: V.red),
@@ -111,7 +111,7 @@ class BookmarksScreen extends StatelessWidget {
               app.clearBookmarks();
               Navigator.pop(context);
             },
-            child: const Text('Remove'),
+            child: Text(context.s.remove),
           ),
         ],
       ),
@@ -165,7 +165,8 @@ class _BookmarkTile extends StatelessWidget {
                   if (item.channelName.isNotEmpty) item.channelName,
                   if (item.durationSeconds > 0)
                     formatDuration(item.durationSeconds),
-                  if (item.viewCount > 0) '${compactViews(item.viewCount)} views',
+                  if (item.viewCount > 0)
+                    '${compactViews(item.viewCount)} ${context.s.viewsSuffix}',
                 ].join(' • '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

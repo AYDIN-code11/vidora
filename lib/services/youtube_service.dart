@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:kmep/kmep.dart';
 import 'package:kmep_flutter_integration/webview_js_runtime.dart';
-import 'package:vidora/services/trending_client.dart';
+import 'package:vidora/core/strings.dart';
+import 'package:vidora/services/home_feed_client.dart';
 
-export 'trending_client.dart';
+export 'home_feed_client.dart';
 
 /// Extracts a video id from common YouTube URL forms (watch, youtu.be,
 /// shorts, embed); returns the input unchanged if it's already a bare id.
@@ -26,30 +27,41 @@ String extractVideoId(String input) {
   return trimmed;
 }
 
-/// Central KMEP wiring for the app: a singleton facade plus small
-/// helpers (trending feed) that ride InnerTube.
+/// Central KMEP wiring for the app: a facade rebuilt when the content
+/// locale changes, plus the search-powered home feed client.
 class Yt {
   Yt._();
 
   static final Yt I = Yt._();
 
   Kmep? _kmep;
-  TrendingClient? _trending;
+  HomeFeedClient? _home;
 
-  static const _ua =
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-      '(KHTML, like Gecko) Chrome/124.0 Safari/537.36';
+  /// Current UI language — drives both the facade's hl and the home
+  /// feed's metadata language.
+  S lang = S.en;
+
+  /// Current content region (gl).
+  String gl = 'US';
 
   /// The shared Kmep facade. Lazily constructed; the headless WebView
-  /// runtimes spin up on first stream resolution.
+  /// runtimes spin up on first stream resolution. Changing [lang] or
+  /// [gl] drops the facade so the next call picks the new locale.
   Kmep get kmep => _kmep ??= Kmep.withOnDevicePoToken(
         // Separate JS contexts: player.js and BotGuard contaminate
         // each other when sharing globals (per KMEP docs).
         jsRuntime: WebViewJsRuntime(),
         potJsRuntime: WebViewJsRuntime(),
         fetchText: fetchText,
+        hl: lang.hl,
+        gl: gl,
       );
-  TrendingClient get trending => _trending ??= TrendingClient();
+
+  HomeFeedClient get home => _home ??= HomeFeedClient();
+
+  static const _ua =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+      '(KHTML, like Gecko) Chrome/124.0 Safari/537.36';
 
   /// Plain HTTP GET as text — the one platform thing KMEP needs.
   static Future<String> fetchText(String url) async {
@@ -67,6 +79,6 @@ class Yt {
   /// teardown; the next access lazily rebuilds everything.
   void dispose() {
     _kmep = null;
-    _trending = null;
+    _home = null;
   }
 }

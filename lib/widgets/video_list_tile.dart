@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:kmep/kmep.dart' show VideoSearchResult;
 import 'package:provider/provider.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/state/app_state.dart';
 import 'package:vidora/widgets/common.dart';
@@ -64,7 +65,7 @@ class VideoListTile extends StatelessWidget {
                   child: Text(
                     video.durationSeconds > 0
                         ? formatDuration(video.durationSeconds)
-                        : 'LIVE',
+                        : context.s.live,
                     style: const TextStyle(
                         color: Colors.white,
                         fontSize: 10,
@@ -104,7 +105,7 @@ class VideoListTile extends StatelessWidget {
                   [
                     if (video.channelName.isNotEmpty) video.channelName,
                     if (video.viewCount > 0)
-                      '${compactViews(video.viewCount)} views',
+                      '${compactViews(video.viewCount)} ${context.s.viewsSuffix}',
                     if (video.uploadDate.isNotEmpty) video.uploadDate,
                   ].join(' • '),
                   maxLines: 1,

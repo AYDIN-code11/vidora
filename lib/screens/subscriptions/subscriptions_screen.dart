@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kmep/kmep.dart' show ChannelVideosPage, VideoSearchResult;
 import 'package:provider/provider.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/models/local_models.dart';
 import 'package:vidora/services/youtube_service.dart';
@@ -95,14 +96,11 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
 
     return Scaffold(
       backgroundColor: V.bg,
-      appBar: AppBar(title: const Text('Subscriptions')),
+      appBar: AppBar(title: Text(context.s.subs)),
       body: subs.isEmpty
-          ? const EmptyView(
-              message:
-                  'No subscriptions yet. Subscribe to channels from any '
-                  'video or channel page.')
+          ? EmptyView(message: context.s.subsEmpty)
           : _loading
-              ? const Loader(label: 'Building your feed…')
+              ? Loader(label: context.s.buildingFeed)
               : _error != null
                   ? ErrorView(message: _error!, onRetry: _reload)
                   : RefreshIndicator(

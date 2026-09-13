@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 
 /// Circular loader in app style.
@@ -51,7 +52,7 @@ class ErrorView extends StatelessWidget {
                 ),
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: Text(context.s.retry),
               ),
             ],
           ),

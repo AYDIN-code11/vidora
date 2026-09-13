@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kmep/kmep.dart' show VideoSearchResult;
 import 'package:provider/provider.dart';
 import 'package:vidora/core/theme.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/models/local_models.dart';
 import 'package:vidora/services/youtube_service.dart';
 import 'package:vidora/state/app_state.dart';
@@ -118,7 +119,7 @@ class _SearchScreenState extends State<SearchScreen> {
             onSubmitted: _run,
             style: const TextStyle(color: V.text, fontSize: 15),
             decoration: InputDecoration(
-              hintText: 'Search videos, shorts, channels…',
+              hintText: context.s.searchHint,
               prefixIcon: const Icon(Icons.search, color: V.textDim, size: 22),
               suffixIcon: _controller.text.isNotEmpty
                   ? IconButton(
@@ -137,7 +138,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       body: _loading
-          ? const Loader(label: 'Searching…')
+          ? Loader(label: context.s.searching)
           : _error != null
               ? ErrorView(message: _error!, onRetry: () => _run(_query))
               : showHistory
@@ -148,8 +149,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _historyList(List<QueryItem> queries) {
     if (queries.isEmpty) {
-      return const EmptyView(
-          message: 'Search for anything on YouTube — anonymously.');
+      return EmptyView(message: context.s.searchHistoryEmpty);
     }
     return ListView.separated(
       padding: const EdgeInsets.symmetric(vertical: 8),

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:kmep/kmep.dart' show VideoSearchResult;
+import 'package:provider/provider.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/services/youtube_service.dart';
+import 'package:vidora/state/app_state.dart';
 import 'package:vidora/widgets/common.dart';
 import 'package:vidora/widgets/video_card.dart';
 
-/// Home screen: trending and category feeds via InnerTube /browse.
+/// Home screen: category feeds (Now, Music, Gaming, News, …) via
+/// seed searches on the InnerTube endpoint that reliably serves the
+/// unauthenticated client. Switching the content language in Settings
+/// localizes titles and view-count texts.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -29,6 +35,20 @@ class _HomeScreenState extends State<HomeScreen>
     _load(0);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reload the visible category when the content language changes.
+    if (_lastLang != context.read<AppState>().lang) {
+      _lastLang = context.read<AppState>().lang;
+      _pages.clear();
+      _errors.clear();
+      _load(_selected.value);
+    }
+  }
+
+  S? _lastLang;
+
   Future<void> _load(int index) async {
     if (_loading[index] == true) return;
     setState(() {
@@ -36,11 +56,12 @@ class _HomeScreenState extends State<HomeScreen>
       _errors[index] = null;
     });
     try {
-      final cat = trendingCategories[index];
-      final videos = await Yt.I.trending.fetch(
-        cat.id,
-        hl: 'en',
-        gl: 'US',
+      final app = context.read<AppState>();
+      final cat = homeCategories[index];
+      final videos = await Yt.I.home.fetch(
+        cat,
+        hl: app.lang.hl,
+        gl: app.region,
       );
       if (!mounted) return;
       setState(() {
@@ -61,8 +82,6 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _openChannel(VideoSearchResult v) {
-    // Channel ids aren't on trending cards; channel page accepts a
-    // channel name search — open the channel finder instead.
     Navigator.of(context)
         .pushNamed('/channel_lookup', arguments: v.channelName);
   }
@@ -93,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen>
             valueListenable: _selected,
             builder: (context, index, _) {
               if (_loading[index] == true) {
-                return const Loader(label: 'Loading feed…');
+                return Loader(label: context.s.loadingFeed);
               }
               final err = _errors[index];
               if (err != null) {
@@ -104,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen>
               }
               final videos = _pages[index] ?? const [];
               if (videos.isEmpty) {
-                return const EmptyView(message: 'Nothing here yet.');
+                return EmptyView(message: context.s.nothingHere);
               }
               return RefreshIndicator(
                 color: V.red,
@@ -151,14 +170,14 @@ class _CategoryStrip extends StatelessWidget {
         builder: (context, sel, _) => ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           scrollDirection: Axis.horizontal,
-          itemCount: trendingCategories.length,
+          itemCount: homeCategories.length,
           separatorBuilder: (_, __) => const SizedBox(width: 8),
           itemBuilder: (context, i) {
-            final cat = trendingCategories[i];
+            final cat = homeCategories[i];
             final active = i == sel;
             return ChoiceChip(
               label: Text(
-                cat.label,
+                _categoryLabel(context, cat.id),
                 style: TextStyle(
                   color: active ? Colors.white : V.textDim,
                   fontSize: 13,
@@ -176,5 +195,27 @@ class _CategoryStrip extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _categoryLabel(BuildContext context, String id) {
+    final s = context.s;
+    switch (id) {
+      case 'music':
+        return s.homeMusic;
+      case 'gaming':
+        return s.homeGaming;
+      case 'news':
+        return s.homeNews;
+      case 'tech':
+        return s.homeTech;
+      case 'sports':
+        return s.homeSports;
+      case 'movies':
+        return s.homeMovies;
+      case 'shorts':
+        return s.homeShorts;
+      default:
+        return s.homeNow;
+    }
   }
 }

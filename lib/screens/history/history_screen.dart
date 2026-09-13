@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/models/local_models.dart';
 import 'package:vidora/state/app_state.dart';
@@ -17,7 +18,7 @@ class HistoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: V.bg,
       appBar: AppBar(
-        title: const Text('History'),
+        title: Text(context.s.history),
         actions: [
           IconButton(
             tooltip: 'Sort',
@@ -35,9 +36,9 @@ class HistoryScreen extends StatelessWidget {
         ],
       ),
       body: !app.historyEnabled
-          ? const EmptyView(message: 'Watch history is disabled in Settings.')
+          ? EmptyView(message: context.s.historyDisabled)
           : entries.isEmpty
-              ? const EmptyView(message: 'Nothing watched yet.')
+              ? EmptyView(message: context.s.nothingWatched)
               : ListView.separated(
                   padding: const EdgeInsets.all(12),
                   itemCount: entries.length,
@@ -64,9 +65,10 @@ class HistoryScreen extends StatelessWidget {
 
   void _pickSort(BuildContext context) {
     final app = context.read<AppState>();
-    const options = [
-      ('Newest first', HistorySort.newest),
-      ('Oldest first', HistorySort.oldest),
+    final s = context.s;
+    final options = [
+      (s.sortNewest, HistorySort.newest),
+      (s.sortOldest, HistorySort.oldest),
     ];
     showModalBottomSheet<void>(
       backgroundColor: V.surface,
@@ -75,10 +77,10 @@ class HistoryScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(14),
-              child: Text('Sort by',
-                  style: TextStyle(
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Text(context.s.sortBy,
+                  style: const TextStyle(
                       color: V.text, fontSize: 15, fontWeight: FontWeight.w700)),
             ),
             for (final (label, value) in options)
@@ -108,15 +110,15 @@ class HistoryScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: V.surface,
-        title: const Text('Clear history?',
-            style: TextStyle(color: V.text)),
-        content: const Text(
-            'This removes all watch history from this device.',
-            style: TextStyle(color: V.textDim)),
+        title: Text(context.s.clearHistoryQ,
+            style: const TextStyle(color: V.text)),
+        content: Text(
+            context.s.clearHistoryBody,
+            style: const TextStyle(color: V.textDim)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: V.textDim)),
+            child: Text(context.s.cancel, style: const TextStyle(color: V.textDim)),
           ),
           TextButton(
             style: TextButton.styleFrom(foregroundColor: V.red),
@@ -124,7 +126,7 @@ class HistoryScreen extends StatelessWidget {
               app.clearHistory();
               Navigator.pop(context);
             },
-            child: const Text('Clear'),
+            child: Text(context.s.clear),
           ),
         ],
       ),
@@ -199,7 +201,7 @@ class _HistoryTile extends StatelessWidget {
                   if (entry.channelName.isNotEmpty) entry.channelName,
                   date,
                   if (pct > 0)
-                    '${(pct * 100).toInt()}% watched'
+                    '${(pct * 100).toInt()}% ${context.s.watchedPct}'
                 ].join(' • '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

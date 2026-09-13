@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:kmep/kmep.dart' show VideoSearchResult;
 import 'package:provider/provider.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/state/app_state.dart';
 import 'package:vidora/widgets/common.dart';
@@ -73,7 +74,7 @@ class VideoCard extends StatelessWidget {
                   child: Text(
                     video.durationSeconds > 0
                         ? formatDuration(video.durationSeconds)
-                        : 'LIVE',
+                        : context.s.live,
                     style:
                         const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
                   ),
@@ -111,7 +112,7 @@ class VideoCard extends StatelessWidget {
                         [
                           if (video.channelName.isNotEmpty) video.channelName,
                           if (video.viewCount > 0)
-                            '${compactViews(video.viewCount)} views',
+                            '${compactViews(video.viewCount)} ${context.s.viewsSuffix}',
                           if (video.uploadDate.isNotEmpty) video.uploadDate,
                         ].join(' • '),
                         maxLines: 1,
@@ -143,21 +144,23 @@ class VideoCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          bookmarked ? 'Remove bookmark' : 'Bookmark',
+                          bookmarked
+                              ? context.s.removeBookmark
+                              : context.s.bookmark,
                           style: const TextStyle(color: V.text, fontSize: 14),
                         ),
                       ]),
                     ),
                     if (onChannelTap != null)
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'channel',
                         child: Row(children: [
-                          Icon(Icons.account_circle_outlined,
+                          const Icon(Icons.account_circle_outlined,
                               color: V.red, size: 18),
-                          SizedBox(width: 10),
-                          Text('Go to channel',
-                              style:
-                                  TextStyle(color: V.text, fontSize: 14)),
+                          const SizedBox(width: 10),
+                          Text(context.s.goChannel,
+                              style: const TextStyle(
+                                  color: V.text, fontSize: 14)),
                         ]),
                       ),
                   ],

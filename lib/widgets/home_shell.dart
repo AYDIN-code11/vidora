@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/screens/bookmarks/bookmarks_screen.dart';
 import 'package:vidora/screens/history/history_screen.dart';
@@ -40,32 +41,32 @@ class _HomeShellState extends State<HomeShell> {
           NavigationDestination(
             icon: _navIcon('home'),
             selectedIcon: _navIcon('home', selected: true),
-            label: 'Home',
+            label: context.s.home,
           ),
           NavigationDestination(
             icon: _navIcon('search'),
             selectedIcon: _navIcon('search', selected: true),
-            label: 'Search',
+            label: context.s.search,
           ),
           NavigationDestination(
             icon: _navIcon('subscriptions'),
             selectedIcon: _navIcon('subscriptions', selected: true),
-            label: 'Subs',
+            label: context.s.subs,
           ),
           NavigationDestination(
             icon: _navIcon('history'),
             selectedIcon: _navIcon('history', selected: true),
-            label: 'History',
+            label: context.s.history,
           ),
           NavigationDestination(
             icon: _navIcon('bookmarks'),
             selectedIcon: _navIcon('bookmarks', selected: true),
-            label: 'Saved',
+            label: context.s.saved,
           ),
           NavigationDestination(
             icon: _navIcon('settings'),
             selectedIcon: _navIcon('settings', selected: true),
-            label: 'Settings',
+            label: context.s.settings,
           ),
         ],
       ),

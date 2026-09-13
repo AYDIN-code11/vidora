@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:kmep/kmep.dart' show VideoInfo, VideoSearchResult;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/models/local_models.dart';
+import 'package:vidora/services/youtube_service.dart' show Yt;
 
 enum HistorySort { newest, oldest }
 
 enum BookmarkSort { newest, oldest, title }
 
 /// App-wide local state: subscriptions, history, bookmarks, search
-/// queries and user settings, persisted to SharedPreferences.
+/// queries, language and user settings, persisted to SharedPreferences.
 class AppState extends ChangeNotifier {
   AppState(this._prefs) {
     _load();
@@ -24,7 +26,9 @@ class AppState extends ChangeNotifier {
   static const _kDefaultRes = 'vidora.player.defaultRes';
   static const _kAutoplayNext = 'vidora.player.autoplayNext';
   static const _kRegion = 'vidora.region';
-  static const _kSearchLimit = 'vidora.search.limit';
+  static const _kAppLang = 'vidora.appLang';
+  static const _kCaptionLang = 'vidora.captions.lang';
+  static const _kCaptionsOn = 'vidora.captions.on';
 
   // ---------------- subscriptions ----------------
 
@@ -49,9 +53,9 @@ class AppState extends ChangeNotifier {
       _kSubs, StoreCodec.encodeList(_subs.map((e) => e.toJson()).toList()));
 
   void _loadSubs() => _subs
-      ..clear()
-      ..addAll(StoreCodec.decodeList(_prefs.getString(_kSubs) ?? '')
-          .map(SubChannel.fromJson));
+    ..clear()
+    ..addAll(StoreCodec.decodeList(_prefs.getString(_kSubs) ?? '')
+        .map(SubChannel.fromJson));
 
   // ---------------- history ----------------
 
@@ -154,7 +158,8 @@ class AppState extends ChangeNotifier {
       case BookmarkSort.oldest:
         copy.sort((a, b) => a.addedAt.compareTo(b.addedAt));
       case BookmarkSort.title:
-        copy.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+        copy.sort((a, b) =>
+            a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     }
     return copy;
   }
@@ -239,8 +244,8 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _persistQueries() => _prefs.setString(
-      _kQueries, StoreCodec.encodeList(_queries.map((e) => e.toJson()).toList()));
+  void _persistQueries() => _prefs.setString(_kQueries,
+      StoreCodec.encodeList(_queries.map((e) => e.toJson()).toList()));
 
   void _loadQueries() => _queries
     ..clear()
@@ -252,7 +257,21 @@ class AppState extends ChangeNotifier {
   int defaultResolution = 720;
   bool autoplayNext = true;
   String region = 'US';
-  int searchLimit = 30;
+
+  /// UI language (9 supported). Mirrors onto the shared Yt facade so
+  /// YouTube metadata comes localized too.
+  S _lang = S.en;
+  S get lang => _lang;
+
+  /// Subtitle translation language (code from
+  /// CaptionService.supportedLanguages).
+  String captionLang = 'en';
+
+  /// Whether the player shows subtitles by default.
+  bool captionsOn = false;
+
+  /// Localized string lookup for the current UI language.
+  String t(String key) => _lang.t(key);
 
   void setDefaultResolution(int h) {
     defaultResolution = h;
@@ -269,12 +288,26 @@ class AppState extends ChangeNotifier {
   void setRegion(String r) {
     region = r;
     _prefs.setString(_kRegion, r);
+    Yt.I.gl = r;
     notifyListeners();
   }
 
-  void setSearchLimit(int v) {
-    searchLimit = v;
-    _prefs.setInt(_kSearchLimit, v);
+  void setAppLanguage(S s) {
+    _lang = s;
+    _prefs.setString(_kAppLang, s.code);
+    Yt.I.lang = s; // YouTube metadata locale follows the UI language
+    notifyListeners();
+  }
+
+  void setCaptionLang(String code) {
+    captionLang = code;
+    _prefs.setString(_kCaptionLang, code);
+    notifyListeners();
+  }
+
+  void setCaptionsOn(bool v) {
+    captionsOn = v;
+    _prefs.setBool(_kCaptionsOn, v);
     notifyListeners();
   }
 
@@ -285,7 +318,11 @@ class AppState extends ChangeNotifier {
     defaultResolution = _prefs.getInt(_kDefaultRes) ?? 720;
     autoplayNext = _prefs.getBool(_kAutoplayNext) ?? true;
     region = _prefs.getString(_kRegion) ?? 'US';
-    searchLimit = _prefs.getInt(_kSearchLimit) ?? 30;
+    _lang = S.parse(_prefs.getString(_kAppLang) ?? 'en');
+    Yt.I.lang = _lang;
+    Yt.I.gl = region;
+    captionLang = _prefs.getString(_kCaptionLang) ?? 'en';
+    captionsOn = _prefs.getBool(_kCaptionsOn) ?? false;
     _loadQueries();
     _loadSubs();
     _loadHistory();

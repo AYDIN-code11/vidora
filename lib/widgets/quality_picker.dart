@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kmep/kmep.dart' show VideoInfo, KMEPStream;
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 
 /// Horizontal quality selector strip below the player.
@@ -35,7 +36,7 @@ class QualityPicker extends StatelessWidget {
           final selected = s.itag == selectedItag;
           return ChoiceChip(
             label: Text(
-              s.isLive ? 'LIVE' : s.quality,
+              s.isLive ? 'LIVE' : context.s.quality,
               style: TextStyle(
                 color: selected ? Colors.white : V.textDim,
                 fontSize: 12.5,

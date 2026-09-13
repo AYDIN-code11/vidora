@@ -7,6 +7,7 @@ import 'package:kmep/kmep.dart'
         kChannelVideosTabPopular,
         kChannelVideosTabOldest;
 import 'package:provider/provider.dart';
+import 'package:vidora/core/strings.dart';
 import 'package:vidora/core/theme.dart';
 import 'package:vidora/models/local_models.dart';
 import 'package:vidora/services/youtube_service.dart';
@@ -137,13 +138,13 @@ class _ChannelScreenState extends State<ChannelScreen> {
       backgroundColor: V.bg,
       appBar: AppBar(
         title: Text(
-          _loading ? 'Channel' : info?.name ?? 'Channel',
+          _loading ? context.s.channel : info?.name ?? context.s.channel,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
       ),
       body: _loading
-          ? const Loader(label: 'Loading channel…')
+          ? Loader(label: context.s.loadingChannel)
           : _error != null
               ? ErrorView(message: _error!, onRetry: _load)
               : _buildBody(info!, subscribed),
@@ -194,9 +195,9 @@ class _ChannelScreenState extends State<ChannelScreen> {
                           [
                             if (info.handle != null) info.handle!,
                             if (info.subscriberCount != null)
-                              '${compactViews(info.subscriberCount!)} subscribers',
+                              '${compactViews(info.subscriberCount!)} ${context.s.subscribers}',
                             if (info.videoCount != null)
-                              '${info.videoCount} videos',
+                              '${info.videoCount} ${context.s.videos}',
                           ].join(' • '),
                           style: const TextStyle(
                               color: V.textDim, fontSize: 12.5),
@@ -221,7 +222,8 @@ class _ChannelScreenState extends State<ChannelScreen> {
                         subscribedAt: DateTime.now(),
                       ));
                     },
-                    child: Text(subscribed ? 'Subscribed' : 'Subscribe',
+                    child: Text(
+                        subscribed ? context.s.subscribed : context.s.subscribe,
                         style: const TextStyle(fontSize: 13)),
                   ),
                 ]),
@@ -247,19 +249,19 @@ class _ChannelScreenState extends State<ChannelScreen> {
               AppIcons.sort.icon(size: 16),
               const SizedBox(width: 8),
               ChoiceChip(
-                label: const Text('Newest'),
+                label: Text(context.s.sortNewest),
                 selected: _sort == _ChanSort.newest,
                 onSelected: (_) => _setSort(_ChanSort.newest),
               ),
               const SizedBox(width: 6),
               ChoiceChip(
-                label: const Text('Popular'),
+                label: Text(context.s.sortPopular),
                 selected: _sort == _ChanSort.popular,
                 onSelected: (_) => _setSort(_ChanSort.popular),
               ),
               const SizedBox(width: 6),
               ChoiceChip(
-                label: const Text('Oldest'),
+                label: Text(context.s.sortOldest),
                 selected: _sort == _ChanSort.oldest,
                 onSelected: (_) => _setSort(_ChanSort.oldest),
               ),
@@ -268,8 +270,8 @@ class _ChannelScreenState extends State<ChannelScreen> {
         ),
         // Videos grid.
         if (_videos.isEmpty)
-          const SliverToBoxAdapter(
-            child: EmptyView(message: 'No videos on this channel.'),
+          SliverToBoxAdapter(
+            child: EmptyView(message: context.s.noVideos),
           )
         else
           SliverPadding(
@@ -353,7 +355,8 @@ class _ChannelLookupScreenState extends State<ChannelLookupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: V.bg,
-      appBar: AppBar(title: Text('Find channel: ${widget.channelName}')),
+      appBar:
+          AppBar(title: Text('${context.s.findChannel}: ${widget.channelName}')),
       body: _loading
           ? const Loader()
           : _error != null
